@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:pos_cahier/ui/pos-food-selection.dart';
 
 
 class MainMenu extends StatefulWidget {
@@ -21,18 +23,18 @@ class _MainMenuState extends State<MainMenu> {
                         flex: 2,
                         fit: FlexFit.tight,
                         child: Container(
-                            child: Text('Group menu'),
+                            child: Text('List meja'),
                             color: Colors.red,
                         )
                     ),
                     Flexible(
-                        flex: 5,
+                        flex: 6,
                         fit: FlexFit.tight,
                         child: Container(
                             padding: EdgeInsets.all(3),
                             color: Colors.white24,
                             child: GridView.count(
-                                crossAxisCount: 4,
+                                crossAxisCount: 5,
                                 children: <Widget>[
                                     Center(
                                         child: Card(
@@ -95,7 +97,9 @@ class _MainMenuState extends State<MainMenu> {
                                                     flex: 6, 
                                                     child: InkWell(
                                                         onTap: (){
-                                                            print('card tap das');
+                                                            Navigator.push(context, 
+                                                              MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
+                                                            );
                                                         },
                                                         child: Image.network('https://picsum.photos/250?image=3')
                                                     )
@@ -238,116 +242,56 @@ class _MainMenuState extends State<MainMenu> {
                                                 ),
                                             ),
                                         ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=2')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=3')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=4')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=5')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=6')),
-                                                ),
-                                            ),
-                                        ),
                                 ],
                             ),
                         )
                     ),
-                    Flexible(
-                        flex: 2,
-                        child: Container(
-                            color: Colors.white60,
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                    Flexible(
-                                        fit: FlexFit.tight,
-                                        flex: 1,
-                                        child: Container(
-                                            color: Colors.greenAccent,
-                                            child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                children: <Widget>[
-                                                    Flexible(
-                                                        flex: 1,
-                                                        fit: FlexFit.tight,
-                                                        child: Container(color: Colors.indigoAccent,)
-                                                    ),
-                                                    Flexible(
-                                                        flex: 3,
-                                                        fit: FlexFit.tight,
-                                                        child: Center(child: Text('Bayar'),)
-                                                    ),
-                                                    Flexible(
-                                                        flex: 1,
-                                                        fit: FlexFit.tight,
-                                                        child: Container(color: Colors.orangeAccent,)
-                                                    ),
+                    // Flexible(
+                    //     flex: 2,
+                    //     child: Container(
+                    //         color: Colors.white60,
+                    //         child: Column(
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             mainAxisAlignment: MainAxisAlignment.start,
+                    //             children: <Widget>[
+                    //                 Flexible(
+                    //                     fit: FlexFit.tight,
+                    //                     flex: 1,
+                    //                     child: Container(
+                    //                         color: Colors.greenAccent,
+                    //                         child: Row(
+                    //                             crossAxisAlignment: CrossAxisAlignment.start,
+                    //                             mainAxisAlignment: MainAxisAlignment.start,
+                    //                             children: <Widget>[
+                    //                                 Flexible(
+                    //                                     flex: 1,
+                    //                                     fit: FlexFit.tight,
+                    //                                     child: Container(color: Colors.indigoAccent,)
+                    //                                 ),
+                    //                                 Flexible(
+                    //                                     flex: 3,
+                    //                                     fit: FlexFit.tight,
+                    //                                     child: Center(child: Text('Bayar'),)
+                    //                                 ),
+                    //                                 Flexible(
+                    //                                     flex: 1,
+                    //                                     fit: FlexFit.tight,
+                    //                                     child: Container(color: Colors.orangeAccent,)
+                    //                                 ),
 
-                                                ],
-                                            ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        fit: FlexFit.tight,
-                                        flex: 6,
-                                        child: Container(color: Colors.white60,)
-                                    ),
-                                ],
-                            ),
-                        )
-                    ),
+                    //                             ],
+                    //                         ),
+                    //                     )
+                    //                 ),
+                    //                 Flexible(
+                    //                     fit: FlexFit.tight,
+                    //                     flex: 6,
+                    //                     child: Container(color: Colors.white60,)
+                    //                 ),
+                    //             ],
+                    //         ),
+                    //     )
+                    // ),
 
                 ],
             ),
