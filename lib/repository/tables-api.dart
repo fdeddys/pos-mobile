@@ -15,7 +15,7 @@ class TabelApi {
         };
         List<Tabel> tabels;
 
-        String apiUrl = serverPath + '/tabel/page/1/count/10';
+        String apiUrl = serverPath + '/table/filter';
 
         var bodyJson = jsonEncode(data);
 
@@ -30,8 +30,10 @@ class TabelApi {
             if (jsonObj['data'] != []) {
                 tabels = ( jsonObj['data'] as List ).map((i)=> Tabel.fromJson(i)).toList();
             }
+            return tabels;
         }
-        throw new Exception('Error ' + jsonObj['message']); 
+        return [];
+        // throw new Exception('Error ' + jsonObj['message']); 
 
     }
 }

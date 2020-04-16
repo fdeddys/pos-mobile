@@ -8,12 +8,16 @@ import 'package:http/http.dart' as http;
 class MenuItemApiClient  {
     String serverPath = globals.serverPath;
 
-    Future<List<MenuItem>> getAllMenuGroup(int groupID) async {
+    Future<List<MenuItem>> getAllMenuItem(String restoCode) async {
 
-        List<MenuItem> menuItems;
-        String apiUrl = serverPath + '/menu-group/$groupID';
+        List<MenuItem> menuItems = [];
+        String apiUrl = serverPath + '/menu-item/filter';
+        Map data = {
+            'restoCode' : restoCode
+        };
 
-        var apiResult =await http.get(apiUrl);
+        var bodyJson = jsonEncode(data);
+        var apiResult =await http.post(apiUrl, body:  bodyJson);
         var jsonObj = json.decode(apiResult.body);
 
          if (jsonObj['rc']=='00'){
@@ -22,6 +26,7 @@ class MenuItemApiClient  {
             }
             return menuItems;
         }
-        throw new Exception('Error ' + jsonObj['message']); 
+        return menuItems;
+        // throw new Exception('Error ' + jsonObj['message']); 
     }
 }
