@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class PosFoodSelector extends StatefulWidget {
 
     final int menuGroupSelected;
-
     const PosFoodSelector({Key key, this.menuGroupSelected}) : super(key: key);
 
     @override
@@ -14,7 +13,6 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
 
     _PosFoodSelectorState(int menuGroupSelected);
 
-    
     @override
     Widget build(BuildContext context) {
         return Scaffold(
