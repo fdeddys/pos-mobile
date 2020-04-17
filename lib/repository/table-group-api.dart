@@ -1,23 +1,23 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:pos_cahier/model/tabel-group.dart';
 
 import 'dart:convert';
 import 'package:pos_cahier/share/globals.dart' as globals;
-import 'package:pos_cahier/model/group-table.dart';
 
 class TabelGroupApiClient {
 
     String serverPath = globals.serverPath;
 
-    Future<List<GroupTabel>> getAllGroupTabel(String restoCode) async {
+    Future<List<TabelGroup>> getAllGroupTabel(String restoCode) async {
 
         Map data = {
             'restoCode' : restoCode
         };
-        List<GroupTabel> groupTabels;
+        List<TabelGroup> groupTabels = [];
 
-        String apiUrl = serverPath + '/group-tabel/page/1/count/1000';
+        String apiUrl = serverPath + '/group-table/filter';
 
         var bodyJson = jsonEncode(data);
 
@@ -33,10 +33,11 @@ class TabelGroupApiClient {
             if (jsonObj['data'] != []) {
                 // OrderResult orderResult = OrderResult.fromJson(jsonObj);
                 // return orderResult.orders;
-                groupTabels = ( jsonObj['data'] as List ).map((i)=> GroupTabel.fromJson(i)).toList();
+                groupTabels = ( jsonObj['data'] as List ).map((i)=> TabelGroup.fromJson(i)).toList();
             }
+            return groupTabels;
         }
-        throw new Exception('Error ' + jsonObj['message']); 
-
+        // throw new Exception('Error ' + jsonObj['message']); 
+        return [];
     }
 }

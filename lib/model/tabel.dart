@@ -1,20 +1,20 @@
 
 import 'package:flutter/material.dart';
-import 'package:pos_cahier/model/group-table.dart';
+import 'package:pos_cahier/model/tabel-group.dart';
 
 class Tabel {
 
     int id;
     String name;
-    int groupTabelId;
-    GroupTabel groupTabel;
+    String groupTabelId;
+    TabelGroup tabelGroup;
 
     Tabel(this.id, this.name, this.groupTabelId);
 
     Tabel.fromJson(Map jsonMap):
     id = jsonMap['id'],
     name = jsonMap['name'],
-    groupTabelId = jsonMap['groupTable'],
-    groupTabel = GroupTabel.fromJson(jsonMap['groupTabel']); 
+    groupTabelId = jsonMap['groupTabelId'];
+    // tabelGroup = TabelGroup.fromJson(jsonMap['groupTabel']); 
 
 }

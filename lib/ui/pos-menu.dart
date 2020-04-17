@@ -1,5 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:pos_cahier/model/tabel-group.dart';
+import 'package:pos_cahier/model/tabel.dart';
+import 'package:pos_cahier/repository/table-group-api.dart';
+import 'package:pos_cahier/repository/tables-api.dart';
 import 'package:pos_cahier/ui/pos-food-selection.dart';
 
 
@@ -9,6 +13,46 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
+
+    List<TabelGroup> tabelGroups =[];
+    List<Tabel> tabelAlls = [];
+    List<Tabel> tabels = [];
+    final TabelGroupApiClient tabelGroupApiClient = TabelGroupApiClient();
+    final TabelApi tabelApi = TabelApi();
+    String restoCode = 'RD0001';
+
+    @override
+    void initState() {
+        super.initState();
+        getDataMenuGroup(restoCode);
+    }
+
+    getDataMenuGroup(String restoCode)async {
+        tabelGroups = await tabelGroupApiClient.getAllGroupTabel(restoCode);
+        tabelAlls = await tabelApi.getTabelByRestoCode(restoCode);
+        print('Menu => total ' + this.tabelGroups.length.toString());
+        print('tabel => ' + this.tabelAlls.length.toString());
+
+        print('for each');
+        if (tabelGroups.length>0) {
+            fillTabels(tabelGroups[0].id.toString());
+        }
+        setState( () => {
+
+        });
+    }   
+
+    fillTabels(String groupTabelId) {
+        tabels =[];
+        for (var tabel in tabelAlls) {
+            print('compate => ['+ tabel.groupTabelId.toString() + '] with [' +groupTabelId + ']');
+            if (tabel.groupTabelId.toString() == groupTabelId) {
+                print('added');
+                tabels.add(tabel);
+            }
+        }
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -23,8 +67,7 @@ class _MainMenuState extends State<MainMenu> {
                         flex: 2,
                         fit: FlexFit.tight,
                         child: Container(
-                            child: Text('List meja'),
-                            color: Colors.red,
+                            child: listTabelGroup(),
                         )
                     ),
                     Flexible(
@@ -33,269 +76,120 @@ class _MainMenuState extends State<MainMenu> {
                         child: Container(
                             padding: EdgeInsets.all(3),
                             color: Colors.white24,
-                            child: GridView.count(
-                                crossAxisCount: 5,
-                                children: <Widget>[
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Column(
-                                                    children: <Widget>[
-                                                        Container(
-                                                            padding: const EdgeInsets.all(8),
-                                                            child: Image.network('https://picsum.photos/250?image=1')
-                                                        ),
-                                                        Flexible(
-                                                            child: Container(
-                                                                padding: const EdgeInsets.all(1),
-                                                                child: 
-                                                                    Text('Barang 1',
-                                                                        overflow: TextOverflow.ellipsis,
-                                                                        style: TextStyle(
-                                                                                color: Colors.red,
-                                                                                fontSize: 8
-                                                                        ),
-                                                                    ),
-                                                          ),
-                                                        )
-                                                    ],
-                                                ),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Column(
-                                                  children: <Widget>[
-                                                        
-                                                        Flexible(
-                                                                        child: Text('Barang 1',
-                                                                              overflow: TextOverflow.ellipsis,
-                                                                              style: TextStyle(
-                                                                                      color: Colors.red,
-                                                                                      fontSize: 8
-                                                                              ),
-                                                                          ),
-                                                        ),
-                                                        Image.network('https://picsum.photos/250?image=2'),
-                                                    ],
-                                                ),
-                                                ),
-                                        ),
-                                    Center(
-                                        child:Column(
-                                            children: <Widget>[
-                                                Flexible(
-                                                    flex: 6, 
-                                                    child: InkWell(
-                                                        onTap: (){
-                                                            Navigator.push(context, 
-                                                              MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
-                                                            );
-                                                        },
-                                                        child: Image.network('https://picsum.photos/250?image=3')
-                                                    )
-                                                ),
-                                                Flexible(
-                                                    flex: 1,  
-                                                    child: 
-                                                        Padding(
-                                                          padding: const EdgeInsets.all(2.0),
-                                                          child: Text('Barang 1 barabfa bsdmbd ambdgfamnb ',
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: TextStyle(
-                                                                      color: Colors.blueAccent,
-                                                                      fontSize: 8,
-                                                                      fontWeight: FontWeight.bold,
-                                                              )
-                                                          ),
-                                                        )
-                                                ),
-                                            ],
-                                        )
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=4')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=5')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=6')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=1')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=2')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=3')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=4')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=5')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=6')),
-                                                ),
-                                            ),
-                                        ),
-                                    Center(
-                                        child: Card(
-                                            child: InkWell(
-                                                splashColor: Colors.blue.withAlpha(30),
-                                                onTap: (){
-                                                    print('card tap');
-                                                },
-                                                child: Container(
-                                                    child: Image.network('https://picsum.photos/250?image=1')),
-                                                ),
-                                            ),
-                                        ),
-                                ],
-                            ),
+                            child: listTable2(),
                         )
                     ),
-                    // Flexible(
-                    //     flex: 2,
-                    //     child: Container(
-                    //         color: Colors.white60,
-                    //         child: Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             mainAxisAlignment: MainAxisAlignment.start,
-                    //             children: <Widget>[
-                    //                 Flexible(
-                    //                     fit: FlexFit.tight,
-                    //                     flex: 1,
-                    //                     child: Container(
-                    //                         color: Colors.greenAccent,
-                    //                         child: Row(
-                    //                             crossAxisAlignment: CrossAxisAlignment.start,
-                    //                             mainAxisAlignment: MainAxisAlignment.start,
-                    //                             children: <Widget>[
-                    //                                 Flexible(
-                    //                                     flex: 1,
-                    //                                     fit: FlexFit.tight,
-                    //                                     child: Container(color: Colors.indigoAccent,)
-                    //                                 ),
-                    //                                 Flexible(
-                    //                                     flex: 3,
-                    //                                     fit: FlexFit.tight,
-                    //                                     child: Center(child: Text('Bayar'),)
-                    //                                 ),
-                    //                                 Flexible(
-                    //                                     flex: 1,
-                    //                                     fit: FlexFit.tight,
-                    //                                     child: Container(color: Colors.orangeAccent,)
-                    //                                 ),
-
-                    //                             ],
-                    //                         ),
-                    //                     )
-                    //                 ),
-                    //                 Flexible(
-                    //                     fit: FlexFit.tight,
-                    //                     flex: 6,
-                    //                     child: Container(color: Colors.white60,)
-                    //                 ),
-                    //             ],
-                    //         ),
-                    //     )
-                    // ),
 
                 ],
             ),
             // drawer: ,
+        );
+    }
+
+
+    Widget listTabelGroup() {
+      return Center(
+          child: ListView.separated(
+              itemBuilder: (context, idx) {
+                  return GestureDetector(
+                    child: groupMenuDetail(idx),
+                    onTap: () { 
+                        print('tap ' + idx.toString());
+                        fillTabels(tabelGroups[idx].id.toString());
+                        setState( () => { });
+                    }, 
+                  );
+              }, 
+              separatorBuilder: (context, index) {
+                  return Divider();
+              }, 
+              itemCount: tabelGroups.length),
+      );
+    }
+
+    Widget groupMenuDetail(idx) {
+        return ListTile(
+          title: 
+              Text( '${tabelGroups[idx].name}' ), 
+        );
+    }
+
+    Widget listTable2() {
+        return GridView.count(
+            crossAxisCount: 5,
+            children: new List<Widget>.generate(tabels.length, (idx){
+                return 
+                    Column(
+                        children: <Widget>[
+                            Flexible(
+                                flex: 6, 
+                                child: InkWell(
+                                    onTap: (){
+                                        Navigator.push(context, 
+                                            MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
+                                        );
+                                    },
+                                    child: Image.network('https://via.placeholder.com/50')
+                                )
+                            ),
+                            Flexible(
+                                flex: 1,  
+                                child: 
+                                    Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: Text('${tabels[idx].name}',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                    color: Colors.blueAccent,
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.bold,
+                                            )
+                                        ),
+                                    )
+                            ),
+                        ],
+                    );
+            }),
+        );
+    }
+
+    Widget listTabel() {
+        return GridView.count(
+            crossAxisCount: 5,
+            children: <Widget>[
+                Center(
+                    child:Column(
+                        children: <Widget>[
+                            Flexible(
+                                flex: 6, 
+                                child: InkWell(
+                                    onTap: (){
+                                        Navigator.push(context, 
+                                            MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
+                                        );
+                                    },
+                                    child: Image.network('https://via.placeholder.com/100')
+                                )
+                            ),
+                            Flexible(
+                                flex: 1,  
+                                child: 
+                                    Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: Text('Barang 1 barabfa bsdmbd ambdgfamnb ',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                    color: Colors.blueAccent,
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.bold,
+                                            )
+                                        ),
+                                    )
+                            ),
+                        ],
+                    )
+                ),
+            ],
         );
     }
 
