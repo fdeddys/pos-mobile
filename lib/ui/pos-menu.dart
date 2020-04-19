@@ -1,7 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:pos_cahier/dbHelper/menu-item.dbRepository.dart';
+import 'package:pos_cahier/model/menu-group.dart';
+import 'package:pos_cahier/model/menu-item.dart';
 import 'package:pos_cahier/model/tabel-group.dart';
 import 'package:pos_cahier/model/tabel.dart';
+import 'package:pos_cahier/repository/menu-group-api.dart';
+import 'package:pos_cahier/repository/menu-item-api.dart';
 import 'package:pos_cahier/repository/table-group-api.dart';
 import 'package:pos_cahier/repository/tables-api.dart';
 import 'package:pos_cahier/ui/pos-food-selection.dart';
@@ -19,6 +24,11 @@ class _MainMenuState extends State<MainMenu> {
     List<Tabel> tabels = [];
     final TabelGroupApiClient tabelGroupApiClient = TabelGroupApiClient();
     final TabelApi tabelApi = TabelApi();
+    final MenuGroupApiClient menuGroupApiClient = MenuGroupApiClient();
+    final MenuItemApiClient menuItemApi = MenuItemApiClient();
+    
+    MenuItemDbRepository itemRepository = new MenuItemDbRepository();
+
     String restoCode = 'RD0001';
 
     @override
@@ -38,9 +48,33 @@ class _MainMenuState extends State<MainMenu> {
             fillTabels(tabelGroups[0].id.toString());
         }
         setState( () => {
-
         });
+        getAllDataItem(restoCode);
     }   
+
+    getAllDataItem(String restoCode) async {
+        List<MenuGroup> menuGroups =[];
+        List<MenuItem> menuItemAlls = [];
+
+        print('get API');
+        // menuGroups = await menuGroupApiClient.getAllMenuGroup(restoCode);
+        menuItemAlls = await menuItemApi.getAllMenuItem(restoCode);
+
+
+        print('insert all data DB');
+        for (var menuItem in menuItemAlls) {
+            await itemRepository.insert(menuItem);
+        }
+        
+        print('retrieve all data');
+        List<MenuItem> allData = await itemRepository.getAllMenuItem();
+        for (var data in allData) {
+            print(data.id);
+        }
+
+
+    }
+
 
     fillTabels(String groupTabelId) {
         tabels =[];
@@ -129,7 +163,9 @@ class _MainMenuState extends State<MainMenu> {
                                             MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
                                         );
                                     },
-                                    child: Image.network('https://via.placeholder.com/50')
+                                    // child: Image.network('https://via.placeholder.com/50')
+                                    child: 
+                                      Image(image :  AssetImage('images/meja.jpg'))
                                 )
                             ),
                             Flexible(
