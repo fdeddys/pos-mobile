@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pos_cahier/model/menu-group.dart';
 import 'package:pos_cahier/model/menu-item.dart';
+import 'package:pos_cahier/model/order-detail.dart';
+import 'package:pos_cahier/model/order.dart';
 import 'package:pos_cahier/repository/menu-group-api.dart';
 import 'package:pos_cahier/repository/menu-item-api.dart';
+import 'package:pos_cahier/repository/order-detail-api.dart';
+import 'package:intl/intl.dart';
 
 class PosFoodSelector extends StatefulWidget {
 
@@ -23,14 +27,36 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
     List<MenuItem> menuItems = [];
     final MenuGroupApiClient menuGroupApiClient = MenuGroupApiClient();
     final MenuItemApiClient tabelApi = MenuItemApiClient();
+    final OrderDetailApi orderDetailApi = OrderDetailApi();
     String restoCode = 'RD0001';
+    Order order ;
+    List<OrderDetail> orderDetails = [];
 
     _PosFoodSelectorState(int menuGroupSelected);
 
+    bool isLoadingItem = true;
     @override
     void initState() {
         super.initState();
         getDataMenuGroup();
+        getOrderByTable();
+        getOderDetail(order.id);
+
+
+        setState(() {
+            isLoadingItem = false;  
+         });
+    }
+
+    getOrderByTable() {
+        order = new Order(151, 'ORDER99', 1, '2020-04-21', 72, 10000, 1, '0', 'unpaid', '0', '', 1, '', 0, 'voucherCode', 10000, 0, 0, 10000);
+        
+    }
+
+    getOderDetail(int orderId) async{
+         print('start get detail ');
+        orderDetails = await orderDetailApi.getAllOrderDetailByOrderId(151);
+        print('total detail ' + orderDetails.length.toString());
     }
 
     getDataMenuGroup()async {
@@ -45,6 +71,8 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
 
         setState(() { });
     }
+
+    final formatCurrency = new NumberFormat.currency(symbol: 'Rp');
 
     fillTabelItems(String groupId) {
         menuItems =[];
@@ -80,11 +108,18 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                     Flexible(
                         flex: 5,
                         fit: FlexFit.tight,
-                        child: Container(
-                            padding: EdgeInsets.all(3),
-                            color: Colors.white24,
-                            child: listItem(),
-                        ) 
+                        child: 
+                            isLoadingItem == false ? 
+                            Container(
+                                  padding: EdgeInsets.all(3),
+                                  color: Colors.white24,
+                                  child: listItem(),
+                            ) 
+                            :
+                            FittedBox(
+                                fit: BoxFit.none,
+                                child: CircularProgressIndicator( valueColor: AlwaysStoppedAnimation(Colors.red) )
+                            ) 
                     ),
 
                     Flexible(
@@ -121,11 +156,12 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
     Widget groupItemDetail(idx) {
         return ListTile(
             dense:true,
-            contentPadding: EdgeInsets.only(left: 2.0, right: 2.0, top: 0.0, bottom: 0.0),
+            contentPadding: EdgeInsets.only(left: 8.0, right: 2.0, top: 0.0, bottom: 0.0),
           title: 
               Text('${menuGroups[idx].name}', style: TextStyle(
-                  color: Colors.blue.shade800,
-                  fontSize: 15
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold
               ),), 
         );
     }
@@ -134,7 +170,7 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
         return Container(
             color: Colors.grey.shade200,
             padding: EdgeInsets.all(3),
-          child: GridView.count(
+            child: GridView.count(
               crossAxisSpacing: 2,
               mainAxisSpacing: 2,
               crossAxisCount: 4,
@@ -151,14 +187,14 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                           
                                           onTap: (){
                                           },
-                                          child: menuItems[idx].imgURL =='' ? 
+                                          child: menuItems[idx].imgURL =='' ?  Image(image :  AssetImage('images/no-image.png'))
                                                 // Image.network('https://via.placeholder.com/100')
-                                                FadeInImage.assetNetwork(
-                                                  placeholder: 'images/blue_loading.gif',
-                                                  image: 'https://via.placeholder.com/100',
-                                                )
-                                              :   
-                                                Image.network('${menuItems[idx].imgURL}')
+                                                // FadeInImage.assetNetwork(
+                                                //     placeholder: 'images/blue_loading.gif',
+                                                //     image: 'https://via.placeholder.com/100',
+                                                   
+                                                // )
+                                              : Image.network('${menuItems[idx].imgURL}')
                                       )
                                   ),
                                 Flexible(
@@ -202,7 +238,11 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                         Flexible(
                             fit: FlexFit.tight,
                             flex: 6,
-                            child: Container(color: Colors.white60,)
+                            // child: listDetail()
+                            child: Container(
+                                color: Colors.green.shade100,
+                                child: listDetail(),
+                            )
                         ),
                         Flexible(
                             fit: FlexFit.tight,
@@ -320,6 +360,116 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                       ),
                   ]
               ),
+            );
+    }
+
+    Widget listDetail() {
+        return ListView.builder(
+            itemExtent: 100.0,
+                itemCount: orderDetails != null ? orderDetails.length : 0,
+                itemBuilder:(context, idx) {
+                    return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                                Text('${orderDetails[idx].menuItem.name}',
+                                    softWrap: true,
+                                    style: 
+                                        TextStyle
+                                            (color: Colors.blue,
+                                                fontSize: 15)
+                                        ),
+                                Text('${formatCurrency.format(orderDetails[idx].price)} ',
+                                    style: 
+                                        TextStyle
+                                            (color: Colors.green,
+                                                fontSize: 15)
+                                    ),
+                                Padding(
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                          Expanded(
+                                              flex: 4,
+                                              child: 
+                                                  RawMaterialButton(
+                                                      child: Icon(
+                                                          Icons.add,
+                                                          color: Colors.red,
+                                                          size: 15.0,
+                                                      ),
+                                                      shape: new RoundedRectangleBorder(
+                                                          borderRadius: new BorderRadius.circular(25.0),
+                                                          side: BorderSide(color: Colors.red)
+                                                      ),
+                                                      elevation: 5.0,
+                                                      fillColor: Colors.white,
+                                                      padding: const EdgeInsets.all(5.0), 
+                                                      onPressed: () { },
+                                                  ),
+                                          ),
+
+                                          SizedBox(width: 10.0),
+
+                                          Expanded(
+                                              flex: 3, 
+                                              child: 
+                                                  RawMaterialButton(
+                                                      child: Text(' ${orderDetails[idx].qty*1} ',
+                                                          textAlign: TextAlign.center,
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 15
+                                                          ),
+                                                      ),
+                                                      // shape: new RoundedRectangleBorder(
+                                                      //     borderRadius: new BorderRadius.circular(25.0),
+                                                      //     side: BorderSide(color: Colors.blue)
+                                                      // ),
+                                                      elevation: 5.0,
+                                                      fillColor: Colors.redAccent,
+                                                      padding: const EdgeInsets.all(5.0), 
+                                                      onPressed: () { },
+                                                  ),
+                                                  // Text(' x ${orderDetails[idx].qty} ',textAlign: TextAlign.center,)
+                                              ),
+                                          
+                                          SizedBox(width: 10.0),
+
+                                          Expanded(
+                                              flex: 4,
+                                              child: 
+                                                  RawMaterialButton(
+                                                      child: Icon(
+                                                          Icons.remove,
+                                                          color: Colors.red,
+                                                          size: 15.0,
+                                                      ),
+                                                      shape: new RoundedRectangleBorder(
+                                                          borderRadius: new BorderRadius.circular(25.0),
+                                                          side: BorderSide(color: Colors.red)
+                                                      ),
+                                                      elevation: 5.0,
+                                                      fillColor: Colors.white,
+                                                      padding: const EdgeInsets.all(5.0), 
+                                                      onPressed: () { },
+                                                  ),
+                                          ),
+
+                                      ],
+                                  ),
+                                )
+                            ],
+                        ),
+                    );
+                },
+                // separatorBuilder: (context, index) {
+                //     return Divider();
+                // },
             );
     }
 

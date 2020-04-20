@@ -71,8 +71,6 @@ class _MainMenuState extends State<MainMenu> {
         for (var data in allData) {
             print(data.id);
         }
-
-
     }
 
 
@@ -122,111 +120,144 @@ class _MainMenuState extends State<MainMenu> {
 
 
     Widget listTabelGroup() {
-      return Center(
-          child: ListView.separated(
-              itemBuilder: (context, idx) {
-                  return GestureDetector(
-                    child: groupMenuDetail(idx),
-                    onTap: () { 
-                        print('tap ' + idx.toString());
-                        fillTabels(tabelGroups[idx].id.toString());
-                        setState( () => { });
+        return Container(
+            color:  Colors.blue.shade200,
+            child: Center(
+                child: ListView.separated(
+                    itemBuilder: (context, idx) {
+                        return GestureDetector(
+                        child: groupMenuDetail(idx),
+                        onTap: () { 
+                            print('tap ' + idx.toString());
+                            fillTabels(tabelGroups[idx].id.toString());
+                            setState( () => { });
+                        }, 
+                        );
                     }, 
-                  );
-              }, 
-              separatorBuilder: (context, index) {
-                  return Divider();
-              }, 
-              itemCount: tabelGroups.length),
-      );
+                    separatorBuilder: (context, index) {
+                        return Divider();
+                    }, 
+                    itemCount: tabelGroups.length),
+            ),
+        );
     }
 
     Widget groupMenuDetail(idx) {
         return ListTile(
           title: 
-              Text( '${tabelGroups[idx].name}' ), 
+              Text( '${tabelGroups[idx].name}',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12
+              ), ), 
         );
     }
 
     Widget listTable2() {
-        return GridView.count(
-            crossAxisCount: 5,
-            children: new List<Widget>.generate(tabels.length, (idx){
-                return 
-                    Column(
-                        children: <Widget>[
-                            Flexible(
-                                flex: 6, 
-                                child: InkWell(
-                                    onTap: (){
-                                        Navigator.push(context, 
-                                            MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
-                                        );
-                                    },
-                                    // child: Image.network('https://via.placeholder.com/50')
-                                    child: 
-                                      Image(image :  AssetImage('images/meja.jpg'))
-                                )
-                            ),
-                            Flexible(
-                                flex: 1,  
-                                child: 
-                                    Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: Text('${tabels[idx].name}',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                    color: Colors.blueAccent,
-                                                    fontSize: 8,
-                                                    fontWeight: FontWeight.bold,
-                                            )
-                                        ),
+        return Container(
+            color: Colors.grey.shade200,
+            // padding: EdgeInsets.all(2),
+          child: GridView.count(
+              crossAxisCount: 6,
+            //    crossAxisSpacing: 2,
+            //     mainAxisSpacing: 2,
+              children: new List<Widget>.generate(tabels.length, (idx){
+                  return 
+                      Container(
+                          padding: EdgeInsets.all(2),
+                          color: Colors.white,
+                        child: Column(
+                            children: <Widget>[
+                                Flexible(
+                                    flex: 5, 
+                                    child: InkWell(
+                                        onTap: (){
+                                            Navigator.push(context, 
+                                                MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
+                                            );
+                                        },
+                                        // child: Image.network('https://via.placeholder.com/50')
+                                        child: 
+                                          Image(image :  AssetImage('images/meja.jpg'))
                                     )
-                            ),
-                        ],
-                    );
-            }),
+                                ),
+                                Flexible(
+                                    flex: 2,  
+                                    child: 
+                                        Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text('${tabels[idx].name}',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                        color: Colors.blueAccent,
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.bold,
+                                                )
+                                            ),
+                                        )
+                                ),
+                                 Flexible(
+                                    flex: 2,  
+                                    child: 
+                                        Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text('open',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                        color: Colors.blueAccent,
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.bold,
+                                                )
+                                            ),
+                                        )
+                                ),
+                            ],
+                        ),
+                      );
+              }),
+          ),
         );
     }
 
-    Widget listTabel() {
-        return GridView.count(
-            crossAxisCount: 5,
-            children: <Widget>[
-                Center(
-                    child:Column(
-                        children: <Widget>[
-                            Flexible(
-                                flex: 6, 
-                                child: InkWell(
-                                    onTap: (){
-                                        Navigator.push(context, 
-                                            MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
-                                        );
-                                    },
-                                    child: Image.network('https://via.placeholder.com/100')
-                                )
-                            ),
-                            Flexible(
-                                flex: 1,  
-                                child: 
-                                    Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: Text('Barang 1 barabfa bsdmbd ambdgfamnb ',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                    color: Colors.blueAccent,
-                                                    fontSize: 8,
-                                                    fontWeight: FontWeight.bold,
-                                            )
-                                        ),
-                                    )
-                            ),
-                        ],
-                    )
-                ),
-            ],
-        );
-    }
+    // Widget listTabel() {
+    //     return GridView.count(
+    //         crossAxisCount: 5,
+    //         children: <Widget>[
+    //             Center(
+    //                 child:Column(
+    //                     children: <Widget>[
+    //                         Flexible(
+    //                             flex: 6, 
+    //                             child: InkWell(
+    //                                 onTap: (){
+    //                                     Navigator.push(context, 
+    //                                         MaterialPageRoute(builder: (context ) => PosFoodSelector(menuGroupSelected: 99))
+    //                                     );
+    //                                 },
+    //                                 child: Image.network('https://via.placeholder.com/100')
+    //                             )
+    //                         ),
+    //                         Flexible(
+    //                             flex: 1,  
+    //                             child: 
+    //                                 Padding(
+    //                                     padding: const EdgeInsets.all(2.0),
+    //                                     child: Text('Barang 1 barabfa bsdmbd ambdgfamnb ',
+    //                                         overflow: TextOverflow.ellipsis,
+    //                                         style: TextStyle(
+    //                                                 color: Colors.blueAccent,
+    //                                                 fontSize: 8,
+    //                                                 fontWeight: FontWeight.bold,
+    //                                         )
+    //                                     ),
+    //                                 )
+    //                         ),
+    //                     ],
+    //                 )
+    //             ),
+    //         ],
+    //     );
+    // }
 
 }
