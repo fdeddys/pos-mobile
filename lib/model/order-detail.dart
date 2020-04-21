@@ -6,8 +6,8 @@ class OrderDetail {
 
     final id;
     final orderId;
-    final eMenuItem;
-    final qty;
+    int eMenuItem;
+    int qty;
     final price;
     final String status;
     String statusDesc;

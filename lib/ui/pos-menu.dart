@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:pos_cahier/dbHelper/menu-group-item.dbrepository.dart';
 import 'package:pos_cahier/dbHelper/menu-item.dbRepository.dart';
 import 'package:pos_cahier/model/menu-group.dart';
 import 'package:pos_cahier/model/menu-item.dart';
@@ -26,8 +28,10 @@ class _MainMenuState extends State<MainMenu> {
     final TabelApi tabelApi = TabelApi();
     final MenuGroupApiClient menuGroupApiClient = MenuGroupApiClient();
     final MenuItemApiClient menuItemApi = MenuItemApiClient();
+    final formatCurrency = new NumberFormat.currency(symbol: 'Rp');
     
     MenuItemDbRepository itemRepository = new MenuItemDbRepository();
+    MenuGroupItemRepository menuGroupRepository = new MenuGroupItemRepository();
 
     String restoCode = 'RD0001';
 
@@ -49,15 +53,16 @@ class _MainMenuState extends State<MainMenu> {
         }
         setState( () => {
         });
-        getAllDataItem(restoCode);
+        await getAllDataItem(restoCode);
+        await getAllDataGroupItem(restoCode);
     }   
 
     getAllDataItem(String restoCode) async {
-        List<MenuGroup> menuGroups =[];
+        
         List<MenuItem> menuItemAlls = [];
 
         print('get API');
-        // menuGroups = await menuGroupApiClient.getAllMenuGroup(restoCode);
+       
         menuItemAlls = await menuItemApi.getAllMenuItem(restoCode);
 
 
@@ -69,10 +74,24 @@ class _MainMenuState extends State<MainMenu> {
         print('retrieve all data');
         List<MenuItem> allData = await itemRepository.getAllMenuItem();
         for (var data in allData) {
-            print(data.id);
+            print('item ' + data.id.toString());
         }
     }
 
+    getAllDataGroupItem(String restoCode) async {
+        List<MenuGroup> menuGroups =[];
+        menuGroups = await menuGroupApiClient.getAllMenuGroup(restoCode);
+
+        for (var menuGroup in menuGroups) {
+            await menuGroupRepository.insert(menuGroup);
+        }
+        
+        print('retrieve all menu group');
+        List<MenuGroup> allData = await menuGroupRepository.getAll();
+        for (var data in allData) {
+            print('item group ->' + data.id.toString());
+        } 
+    }
 
     fillTabels(String groupTabelId) {
         tabels =[];

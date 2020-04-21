@@ -9,6 +9,7 @@ class DbHelper {
 
     static DbHelper _dbHelper;
     static Database _database;
+    static int deletedDb = 0;
 
     DbHelper._createObject();
 
@@ -24,6 +25,14 @@ class DbHelper {
         Directory directory = await getApplicationDocumentsDirectory();
         String path = directory.path + '/pos.db';
         print('path database =>' + path);
+
+        if (deletedDb == 0  ) {
+          print('delete database');
+          deleteDatabase(path);
+          deletedDb++;
+        }
+        
+        print('create database');
         var posDb = openDatabase(path, version: 1, onCreate: _createDb);
         // _createDb(_database, 1);
         return posDb;
@@ -55,14 +64,12 @@ class DbHelper {
         print('drop create e_menu_item');        
         await db.execute('DROP TABLE IF EXISTS e_menu_group');
         await db.execute(''' 
-
         CREATE TABLE  e_menu_group (
             id Integer primary key autoincrement,
-            resto_id integer,
+            restoId integer,
             "name" text,
-            img_url text,
-            status integer,
-            jam_buka text
+            imgUrl text,
+            status integer
         )
         ''');
         print('created e_menu_group'); 

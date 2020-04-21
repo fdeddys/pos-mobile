@@ -2,12 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pos_cahier/dbHelper/menu-group-item.dbrepository.dart';
+import 'package:pos_cahier/dbHelper/menu-item.dbRepository.dart';
 import 'package:pos_cahier/model/menu-group.dart';
 import 'package:pos_cahier/model/menu-item.dart';
 import 'package:pos_cahier/model/order-detail.dart';
 import 'package:pos_cahier/model/order.dart';
-import 'package:pos_cahier/repository/menu-group-api.dart';
-import 'package:pos_cahier/repository/menu-item-api.dart';
+
 import 'package:pos_cahier/repository/order-detail-api.dart';
 import 'package:intl/intl.dart';
 
@@ -20,14 +21,23 @@ class PosFoodSelector extends StatefulWidget {
     _PosFoodSelectorState createState() => _PosFoodSelectorState(menuGroupSelected);
 }
 
+enum TrxPopMenu { printInvoice, printCaption, movingTable, joinBill, Payment }
+
 class _PosFoodSelectorState extends State<PosFoodSelector> {
+
+    final formatCurrency = new NumberFormat.currency(symbol: 'Rp');
 
     List<MenuGroup> menuGroups =[];
     List<MenuItem> menuItemAlls = [];
     List<MenuItem> menuItems = [];
-    final MenuGroupApiClient menuGroupApiClient = MenuGroupApiClient();
-    final MenuItemApiClient tabelApi = MenuItemApiClient();
+    // final MenuGroupApiClient menuGroupApiClient = MenuGroupApiClient();
+    // final MenuItemApiClient tabelApi = MenuItemApiClient();
     final OrderDetailApi orderDetailApi = OrderDetailApi();
+    
+
+    MenuItemDbRepository itemRepository = new MenuItemDbRepository();
+    MenuGroupItemRepository menuGroupItemRepository = new MenuGroupItemRepository();
+
     String restoCode = 'RD0001';
     Order order ;
     List<OrderDetail> orderDetails = [];
@@ -41,8 +51,7 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
         getDataMenuGroup();
         getOrderByTable();
         getOderDetail(order.id);
-
-
+        
         setState(() {
             isLoadingItem = false;  
          });
@@ -53,15 +62,32 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
         
     }
 
-    getOderDetail(int orderId) async{
-         print('start get detail ');
+    Future<int> getOderDetail(int orderId) async{
+        print('start get detail ');
         orderDetails = await orderDetailApi.getAllOrderDetailByOrderId(151);
         print('total detail ' + orderDetails.length.toString());
+        setState(() {
+            
+         });
+        countTotal();
     }
 
-    getDataMenuGroup()async {
-        menuGroups = await menuGroupApiClient.getAllMenuGroup('RD0001');
-        menuItemAlls = await tabelApi.getAllMenuItem('RD0001');
+    getDataMenuGroup() async {
+
+        print('retrieve all data');
+
+        // menuGroups = await menuGroupApiClient.getAllMenuGroup('RD0001');
+        menuGroups = await menuGroupItemRepository.getAll();
+        for (var menugr in menuGroups) {
+            print('item group ' + menugr.name);
+        }
+
+        // menuItemAlls = await tabelApi.getAllMenuItem('RD0001');
+        menuItemAlls = await itemRepository.getAllMenuItem();
+        for (var data in menuItemAlls) {
+            print('item = ' + data.name);
+        }
+
         print('Menu group => ' + this.menuGroups.length.toString());
         print('Menu item => ' + this.menuItemAlls.length.toString());
 
@@ -72,7 +98,54 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
         setState(() { });
     }
 
-    final formatCurrency = new NumberFormat.currency(symbol: 'Rp');
+    updateQty(int menuItemId, int qty){
+        for (var i = 0; i < orderDetails.length ; i++) {
+            print('compare ' + orderDetails[i].menuItem.id.toString() + '  ' +menuItemId.toString());
+            if (orderDetails[i].menuItem.id == menuItemId) {
+                setState(() {
+                    orderDetails[i].qty = orderDetails[i].qty + qty;  
+                });
+                countTotal();            
+                return;
+            }
+        }
+    }
+
+    addItem(MenuItem menuItem ){
+
+        if (orderDetails.length > 0) {
+            for (var i = 0; i < orderDetails.length ; i++) {
+                print('compare ' + orderDetails[i].menuItem.id.toString() + '  ' + menuItem.id.toString());
+                if (orderDetails[i].menuItem.id == menuItem.id) {
+                    setState(() {
+                        orderDetails[i].qty++;  
+                    });
+                    print('update qty');
+                    countTotal();            
+                    return;
+                }
+            }
+        }
+          
+        OrderDetail orderDetail = new OrderDetail(1, order.id, menuItem.id, 1, menuItem.price, '0', ''); 
+        orderDetail.menuItem = menuItem;
+        print('add new item id->' + orderDetail.menuItem.id.toString());
+        setState(() {
+            orderDetails.add(orderDetail);
+        });
+        countTotal();
+    }
+
+    countTotal() async {
+        int total =0;
+        for (var i = 0; i < orderDetails.length; i++) {
+            total+=(orderDetails[i].price * orderDetails[i].qty);   
+        }
+        setState(() {
+            order.grandTotal = total;
+        });
+        
+    }
 
     fillTabelItems(String groupId) {
         menuItems =[];
@@ -95,6 +168,9 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
         return Scaffold(
             appBar: AppBar(
                 title: Text('Transaction'),
+                actions: <Widget>[
+                    popupmenu(),
+                ]
             ),
             body: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -130,6 +206,46 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                 ],
             )
         );
+    }
+
+    Widget popupmenu() {
+        return
+            PopupMenuButton<TrxPopMenu>(
+                elevation: 10.0,
+                icon: Icon(Icons.toc),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                    )
+                ),
+                color: Colors.grey.shade200,
+                onSelected: (TrxPopMenu result) { print('Result ' + result.toString() ); },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<TrxPopMenu>>[
+                    const PopupMenuItem<TrxPopMenu>(
+                        value: TrxPopMenu.printCaption,
+                        child: Text('Print invoice'),
+                    ),
+                    const PopupMenuItem<TrxPopMenu>(
+                        value: TrxPopMenu.printInvoice,
+                        child: Text('Print caption'),
+                    ),
+                    PopupMenuDivider(),
+                    const PopupMenuItem<TrxPopMenu>(
+                        value: TrxPopMenu.joinBill,
+                        child: Text('Join Bill'),
+                    ),
+                    const PopupMenuItem<TrxPopMenu>(
+                        value: TrxPopMenu.movingTable,
+                        child: Text('Move table'),
+                    ),
+                    PopupMenuDivider(),
+                    const PopupMenuItem<TrxPopMenu>(
+                        value: TrxPopMenu.Payment,
+                        child: Text('payment'),
+                    ),
+                ],
+            );
+                
     }
 
     Widget listItemGroup() {
@@ -186,6 +302,7 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                       child: InkWell(
                                           
                                           onTap: (){
+                                              addItem(menuItems[idx]);
                                           },
                                           child: menuItems[idx].imgURL =='' ?  Image(image :  AssetImage('images/no-image.png'))
                                                 // Image.network('https://via.placeholder.com/100')
@@ -244,11 +361,11 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                 child: listDetail(),
                             )
                         ),
-                        Flexible(
-                            fit: FlexFit.tight,
-                            flex: 1,
-                            child: footerButton()
-                        ),
+                        // Flexible(
+                        //     fit: FlexFit.tight,
+                        //     flex: 1,
+                        //     child: footerButton()
+                        // ),
                         Flexible(
                             fit: FlexFit.tight,
                             flex: 1,
@@ -300,12 +417,12 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                         Flexible(
                             flex: 1,
                             fit: FlexFit.tight,
-                            child: Text('Total Belanja :',
+                            child: Text('Total : ${formatCurrency.format(order.grandTotal)}',
                                 overflow: TextOverflow.ellipsis,
                                 style: 
                                     TextStyle(
                                         wordSpacing: 1.0,
-                                        fontSize: 12, 
+                                        fontSize: 15, 
                                         color: Colors.white),
                                     )
                         ),
@@ -365,7 +482,7 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
 
     Widget listDetail() {
         return ListView.builder(
-            itemExtent: 100.0,
+            itemExtent: 95.0,
                 itemCount: orderDetails != null ? orderDetails.length : 0,
                 itemBuilder:(context, idx) {
                     return Padding(
@@ -376,6 +493,7 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                             children: <Widget>[
                                 Text('${orderDetails[idx].menuItem.name}',
                                     softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
                                     style: 
                                         TextStyle
                                             (color: Colors.blue,
@@ -409,7 +527,9 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                                       elevation: 5.0,
                                                       fillColor: Colors.white,
                                                       padding: const EdgeInsets.all(5.0), 
-                                                      onPressed: () { },
+                                                      onPressed: () {
+                                                          updateQty(orderDetails[idx].menuItem.id, 1);
+                                                       },
                                                   ),
                                           ),
 
@@ -433,7 +553,9 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                                       elevation: 5.0,
                                                       fillColor: Colors.redAccent,
                                                       padding: const EdgeInsets.all(5.0), 
-                                                      onPressed: () { },
+                                                      onPressed: () {
+                                                          
+                                                       },
                                                   ),
                                                   // Text(' x ${orderDetails[idx].qty} ',textAlign: TextAlign.center,)
                                               ),
@@ -455,8 +577,11 @@ class _PosFoodSelectorState extends State<PosFoodSelector> {
                                                       ),
                                                       elevation: 5.0,
                                                       fillColor: Colors.white,
-                                                      padding: const EdgeInsets.all(5.0), 
-                                                      onPressed: () { },
+                                                      padding: const EdgeInsets.all(5.0),
+                                                       
+                                                      onPressed: () { 
+                                                          orderDetails[idx].qty < 1 ? null : updateQty(orderDetails[idx].menuItem.id, -1);
+                                                      },
                                                   ),
                                           ),
 

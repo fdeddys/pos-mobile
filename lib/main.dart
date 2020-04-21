@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
         return MaterialApp(
-        title: 'POS Kita',
+        title: 'POS ',
         theme: ThemeData(primarySwatch: Colors.blue,),
         home: MainMenu(),
         );
