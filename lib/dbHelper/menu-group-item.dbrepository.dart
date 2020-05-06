@@ -10,7 +10,11 @@ class MenuGroupItemRepository {
     Future<int> insert (MenuGroup menuGroup) async {
         final Database db = await dbHelper.initDb();
 
-        return await db.insert("e_menu_group", menuGroup.toMap());
+        return await db.insert(
+            "e_menu_group", 
+            menuGroup.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace
+        );
 
     }
 
